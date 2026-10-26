@@ -5,33 +5,39 @@ on:
     types: [update_financial_html]
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  update-html:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
-      - name: Generate index.html
+      - name: Generate site
         env:
           HTML_B64: ${{ github.event.client_payload.html_b64 }}
         run: |
-          printf '%s' "$HTML_B64" | base64 --decode > index.html
+          mkdir -p _site
+          printf '%s' "$HTML_B64" | base64 --decode > _site/index.html
 
-      - name: Commit updated report
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
 
-          git add index.html
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
 
-          if git diff --cached --quiet; then
-            echo "No changes detected"
-            exit 0
-          fi
-
-          git commit -m "Update financial alert"
-          git push
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
