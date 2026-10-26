@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Executive Financial Alert</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Segoe UI, Arial, sans-serif;
+    background:#f4f6f9;
+    color:#1f2937;
+}
+
+.page{
+    max-width:1400px;
+    margin:auto;
+    padding:32px;
+}
+
+.header{
+    background:#111827;
+    color:white;
+    border-radius:18px;
+    padding:30px 34px;
+    margin-bottom:22px;
+}
+
+.header-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+
+.badge{
+    background:#991b1b;
+    padding:7px 13px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.8px;
+}
+
+.periodo{
+    opacity:.75;
+    font-size:14px;
+}
+
+h1{
+    margin:18px 0 8px 0;
+    font-size:30px;
+    line-height:1.2;
+}
+
+.summary{
+    font-size:15px;
+    line-height:1.6;
+    color:#d1d5db;
+    max-width:1100px;
+}
+
+.section-title{
+    margin:28px 0 14px;
+    font-size:18px;
+    font-weight:700;
+}
+
+.kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+}
+
+.card{
+    background:white;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 4px 16px rgba(0,0,0,.05);
+}
+
+.kpi-label{
+    font-size:12px;
+    color:#6b7280;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.kpi-value{
+    margin-top:8px;
+    font-size:28px;
+    font-weight:700;
+}
+
+.kpi-sub{
+    margin-top:7px;
+    font-size:13px;
+    color:#6b7280;
+}
+
+.negative{
+    color:#b91c1c;
+}
+
+.positive{
+    color:#047857;
+}
+
+.two-cols{
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    gap:18px;
+    margin-top:18px;
+}
+
+.chart{
+    min-height:260px;
+}
+
+.chart svg{
+    width:100%;
+    height:250px;
+}
+
+.message{
+    line-height:1.65;
+    font-size:14px;
+}
+
+.drivers-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.driver{
+    border-top:4px solid #b91c1c;
+}
+
+.driver-rank{
+    font-size:12px;
+    color:#6b7280;
+}
+
+.driver-title{
+    margin-top:5px;
+    font-size:19px;
+    font-weight:700;
+}
+
+.driver-impact{
+    font-size:25px;
+    font-weight:700;
+    margin:10px 0;
+    color:#b91c1c;
+}
+
+.driver-text{
+    font-size:13px;
+    line-height:1.55;
+    color:#4b5563;
+}
+
+.tags{
+    margin-top:14px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.tag{
+    font-size:11px;
+    padding:5px 8px;
+    border-radius:12px;
+    background:#eef2f7;
+    color:#374151;
+}
+
+.compensadores{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.compensador{
+    padding:10px 14px;
+    border-radius:12px;
+    background:#ecfdf5;
+    color:#065f46;
+    font-size:13px;
+}
+
+.actions{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.action-number{
+    width:30px;
+    height:30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#111827;
+    color:white;
+    border-radius:50%;
+    font-weight:700;
+    font-size:13px;
+}
+
+.action-title{
+    margin:12px 0 7px;
+    font-weight:700;
+}
+
+.action-detail{
+    font-size:13px;
+    line-height:1.55;
+    color:#4b5563;
+}
+
+.footer{
+    margin-top:30px;
+    font-size:11px;
+    color:#9ca3af;
+    text-align:center;
+}
+
+@media(max-width:900px){
+    .kpi-grid,
+    .drivers-grid,
+    .actions,
+    .two-cols{
+        grid-template-columns:1fr;
+    }
+}
+
+@media print{
+    body{
+        background:white;
+    }
+
+    .page{
+        max-width:none;
+        padding:15mm;
+    }
+
+    .card{
+        box-shadow:none;
+        border:1px solid #e5e7eb;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="header">
+
+        <div class="header-top">
+            <div class="badge">ALERTA FINANCIERA</div>
+            <div class="periodo" id="periodo"></div>
+        </div>
+
+        <h1 id="headline"></h1>
+
+        <div class="summary" id="resumen"></div>
+
+    </div>
+
+
+    <div class="section-title">Situación ejecutiva</div>
+
+    <div class="kpi-grid" id="kpis"></div>
+
+
+    <div class="two-cols">
+
+        <div class="card">
+
+            <div class="section-title" style="margin-top:0">
+                Evolución EBITDA
+            </div>
+
+            <div class="chart" id="chartEbitda"></div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="section-title" style="margin-top:0">
+                Lectura de la evolución
+            </div>
+
+            <div class="message" id="tendenciaMensaje"></div>
+
+            <div class="section-title">
+                Factores compensadores
+            </div>
+
+            <div class="compensadores" id="compensadores"></div>
+
+        </div>
+
+    </div>
+
+
+    <div class="section-title">
+        Prioridades de investigación
+    </div>
+
+    <div class="drivers-grid" id="drivers"></div>
+
+
+    <div class="section-title">
+        Plan de actuación
+    </div>
+
+    <div class="actions" id="acciones"></div>
+
+
+    <div class="footer">
+        Executive Financial Alert · Generado automáticamente
+    </div>
+
+</div>
+
+
+<script>
+
+const report = {"meta":{"periodo":"2026-09"},"analisis":{"headline":"Fuerte deterioro del EBITDA tras caída de ventas y aumento de gastos operativos","resumen":"El EBITDA de septiembre cae un 81% frente al presupuesto, afectado principalmente por la reducción de ventas (-8%) y el incremento de gastos de personal (+13%) y marketing (+48%). El margen bruto se sitúa un 15% por debajo del objetivo, reflejando menor contribución comercial. Los menores costes de ventas y otros OPEX compensan parcialmente el impacto negativo. Tras la recuperación de junio, se confirma una recaída con tres meses consecutivos de empeoramiento.","tendenciaMensaje":"Tras la recuperación del EBITDA en junio, se inicia una recaída sostenida durante julio, agosto y septiembre. Las ventas alcanzaron su máximo en julio y luego descendieron dos meses consecutivos, mientras el margen bruto también se deteriora. El gasto en personal y marketing mantiene una tendencia ascendente de cinco meses, presionando la rentabilidad."},"periodoActual":[{"periodo":"2026-09","indicador":"Ventas","tipo":"Cuenta","unidadValor":"EUR","real":1210000.0,"previsto":1320000.0,"anioAnterior":1140000.0,"desvPresupuesto":-8.333333333333332,"desvAnioAnterior":6.140350877192982,"unidadDesviacion":"%"},{"periodo":"2026-09","indicador":"Coste de ventas","tipo":"Cuenta","unidadValor":"EUR","real":760000.0,"previsto":792000.0,"anioAnterior":670000.0,"desvPresupuesto":-4.040404040404041,"desvAnioAnterior":13.432835820895523,"unidadDesviacion":"%"},{"periodo":"2026-09","indicador":"Personal","tipo":"Cuenta","unidadValor":"EUR","real":252000.0,"previsto":222000.0,"anioAnterior":218000.0,"desvPresupuesto":13.513513513513514,"desvAnioAnterior":15.59633027522936,"unidadDesviacion":"%"},{"periodo":"2026-09","indicador":"Marketing","tipo":"Cuenta","unidadValor":"EUR","real":68000.0,"previsto":46000.0,"anioAnterior":41000.0,"desvPresupuesto":47.82608695652174,"desvAnioAnterior":65.85365853658537,"unidadDesviacion":"%"},{"periodo":"2026-09","indicador":"Otros OPEX","tipo":"Cuenta","unidadValor":"EUR","real":104000.0,"previsto":122000.0,"anioAnterior":75000.0,"desvPresupuesto":-14.754098360655737,"desvAnioAnterior":38.666666666666664,"unidadDesviacion":"%"},{"periodo":"2026-09","indicador":"Margen Bruto","tipo":"KPI","unidadValor":"EUR","real":450000.0,"previsto":528000.0,"anioAnterior":470000.0,"desvPresupuesto":-14.772727272727273,"desvAnioAnterior":-4.25531914893617,"unidadDesviacion":"%"},{"periodo":"2026-09","indicador":"Margen %","tipo":"KPI","unidadValor":"%","real":37.1900826446281,"previsto":40.0,"anioAnterior":41.228070175438596,"desvPresupuesto":-2.809917355371905,"desvAnioAnterior":-4.0379875308105,"unidadDesviacion":"pp"},{"periodo":"2026-09","indicador":"EBITDA","tipo":"KPI","unidadValor":"EUR","real":26000.0,"previsto":138000.0,"anioAnterior":136000.0,"desvPresupuesto":-81.15942028985508,"desvAnioAnterior":-80.88235294117648,"unidadDesviacion":"%"}],"tendencia6Meses":[{"periodo":"2026-04","ventasReal":1200000.0,"ventasPpto":1220000.0,"margenPctReal":39.33333333333333,"margenPctPpto":40.0,"ebitdaReal":103000,"ebitdaPpto":129000,"personalReal":219000.0,"marketingReal":45000.0,"costeVentasReal":728000.0,"costeVentasPpto":732000.0,"personalPpto":215000.0,"marketingPpto":42000.0,"otrosOpexReal":105000.0,"otrosOpexPpto":102000.0,"margenBrutoReal":472000,"margenBrutoPpto":488000,"desvEbitdaPpto":-20.155038759689923},{"periodo":"2026-05","ventasReal":1215000.0,"ventasPpto":1240000.0,"margenPctReal":38.93004115226337,"margenPctPpto":40.0,"ebitdaReal":100000,"ebitdaPpto":133000,"personalReal":221000.0,"marketingReal":46000.0,"costeVentasReal":742000.0,"costeVentasPpto":744000.0,"personalPpto":216000.0,"marketingPpto":43000.0,"otrosOpexReal":106000.0,"otrosOpexPpto":104000.0,"margenBrutoReal":473000,"margenBrutoPpto":496000,"desvEbitdaPpto":-24.81203007518797},{"periodo":"2026-06","ventasReal":1255000.0,"ventasPpto":1260000.0,"margenPctReal":40.0,"margenPctPpto":40.0,"ebitdaReal":132000,"ebitdaPpto":135000,"personalReal":223000.0,"marketingReal":47000.0,"costeVentasReal":753000.0,"costeVentasPpto":756000.0,"personalPpto":218000.0,"marketingPpto":44000.0,"otrosOpexReal":100000.0,"otrosOpexPpto":107000.0,"margenBrutoReal":502000,"margenBrutoPpto":504000,"desvEbitdaPpto":-2.2222222222222223},{"periodo":"2026-07","ventasReal":1295000.0,"ventasPpto":1280000.0,"margenPctReal":38.996138996138995,"margenPctPpto":40.0,"ebitdaReal":119000,"ebitdaPpto":135000,"personalReal":228000.0,"marketingReal":50000.0,"costeVentasReal":790000.0,"costeVentasPpto":768000.0,"personalPpto":220000.0,"marketingPpto":45000.0,"otrosOpexReal":108000.0,"otrosOpexPpto":112000.0,"margenBrutoReal":505000,"margenBrutoPpto":512000,"desvEbitdaPpto":-11.851851851851853},{"periodo":"2026-08","ventasReal":1240000.0,"ventasPpto":1300000.0,"margenPctReal":37.983870967741936,"margenPctPpto":40.0,"ebitdaReal":71000,"ebitdaPpto":135000,"personalReal":245000.0,"marketingReal":62000.0,"costeVentasReal":769000.0,"costeVentasPpto":780000.0,"personalPpto":220000.0,"marketingPpto":45000.0,"otrosOpexReal":93000.0,"otrosOpexPpto":120000.0,"margenBrutoReal":471000,"margenBrutoPpto":520000,"desvEbitdaPpto":-47.40740740740741},{"periodo":"2026-09","ventasReal":1210000.0,"ventasPpto":1320000.0,"margenPctReal":37.1900826446281,"margenPctPpto":40.0,"ebitdaReal":26000,"ebitdaPpto":138000,"personalReal":252000.0,"marketingReal":68000.0,"costeVentasReal":760000.0,"costeVentasPpto":792000.0,"personalPpto":222000.0,"marketingPpto":46000.0,"otrosOpexReal":104000.0,"otrosOpexPpto":122000.0,"margenBrutoReal":450000,"margenBrutoPpto":528000,"desvEbitdaPpto":-81.15942028985508}],"drivers":[{"area":"Ventas","prioridad":1,"impactoEbitda":-110000.0,"real":1210000.0,"presupuesto":1320000.0,"dimensiones":["Cliente","Línea de negocio","Volumen","Precio"]},{"area":"Personal","prioridad":2,"impactoEbitda":-30000.0,"real":252000.0,"presupuesto":222000.0,"dimensiones":["Departamento","FTE","Horas extra","Temporalidad"]},{"area":"Marketing","prioridad":3,"impactoEbitda":-22000.0,"real":68000.0,"presupuesto":46000.0,"dimensiones":["Campaña","Canal","Inversión","Leads","Oportunidades","ROI"]}],"compensadores":[{"area":"Coste de ventas","orden":1,"impactoEbitda":32000.0,"real":760000.0,"presupuesto":792000.0,"tipoImpacto":"compensador"},{"area":"Otros OPEX","orden":2,"impactoEbitda":18000.0,"real":104000.0,"presupuesto":122000.0,"tipoImpacto":"compensador"}],"hechosEvolucion":{"periodoActual":"2026-09","ebitdaEstadoUltimoMes":"EMPEORA","ebitdaCambioVsMesAnteriorPP":-33.752012882447666,"ebitdaRacha":3,"ebitdaMesMayorRecuperacion":"2026-06","ebitdaRecuperacionConRecaida":"SI","ventasEstadoUltimoMes":"BAJA","ventasRacha":2,"ventasMesMaximo":"2026-07","ventasValorMaximo":1295000.0,"personalEstadoUltimoMes":"SUBE","personalRacha":5,"marketingEstadoUltimoMes":"SUBE","marketingRacha":5,"margenEstadoUltimoMes":"BAJA","margenRacha":3},"investigaciones":[{"area":"Ventas","prioridad":1,"motivo":"Las ventas se sitúan un 8% por debajo del presupuesto y muestran dos meses consecutivos de descenso tras el máximo de julio, lo que impacta directamente en el margen y el EBITDA.","dimensiones":["Cliente","Línea de negocio","Volumen","Precio"]},{"area":"Personal","prioridad":2,"motivo":"El gasto de personal supera en un 13% el presupuesto y acumula cinco meses consecutivos de incremento, lo que contribuye al deterioro del EBITDA.","dimensiones":["Departamento","FTE","Horas extra","Temporalidad"]},{"area":"Marketing","prioridad":3,"motivo":"El gasto en marketing excede el presupuesto en un 48% y mantiene una tendencia ascendente prolongada, requiriendo revisión de campañas y retorno de inversión.","dimensiones":["Campaña","Canal","Inversión","Leads","Oportunidades","ROI"]}],"acciones":[{"orden":1,"titulo":"Analizar la caída de ventas","detalle":"Revisar el comportamiento por cliente, línea de negocio, volumen y precio para identificar los segmentos que explican la reducción tras el máximo de julio."},{"orden":2,"titulo":"Contrastar evolución del gasto de personal","detalle":"Verificar la composición del incremento en personal por departamento, FTE y temporalidad, y su relación con la evolución operativa reciente."},{"orden":3,"titulo":"Evaluar el aumento de inversión en marketing","detalle":"Analizar campañas, canales y retorno de inversión para determinar si el incremento de gasto está generando resultados proporcionales en leads y oportunidades."}]};
+
+
+/* =========================
+   FORMATOS
+========================= */
+
+const money = value =>
+    new Intl.NumberFormat(
+        'es-ES',
+        {
+            style:'currency',
+            currency:'EUR',
+            maximumFractionDigits:0
+        }
+    ).format(value);
+
+const number = value =>
+    new Intl.NumberFormat('es-ES').format(value);
+
+const pct = value =>
+    `${Number(value).toFixed(1)} %`;
+
+const pp = value =>
+    `${Number(value).toFixed(1)} pp`;
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function getIndicador(nombre){
+    return report.periodoActual.find(
+        x => x.indicador === nombre
+    );
+}
+
+function getInvestigacion(area){
+    return report.investigaciones.find(
+        x => x.area === area
+    );
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+document.getElementById('periodo').textContent =
+    report.meta.periodo;
+
+document.getElementById('headline').textContent =
+    report.analisis.headline;
+
+document.getElementById('resumen').textContent =
+    report.analisis.resumen;
+
+document.getElementById('tendenciaMensaje').textContent =
+    report.analisis.tendenciaMensaje;
+
+
+/* =========================
+   KPIs
+========================= */
+
+const ebitda = getIndicador('EBITDA');
+const margen = getIndicador('Margen %');
+const ventas = getIndicador('Ventas');
+
+const kpis = [
+
+    {
+        label:'EBITDA',
+        value:money(ebitda.real),
+        sub:`Presupuesto ${money(ebitda.previsto)}`
+    },
+
+    {
+        label:'Desviación EBITDA',
+        value:pct(ebitda.desvPresupuesto),
+        sub:`Impacto ${money(ebitda.real-ebitda.previsto)}`,
+        negative:true
+    },
+
+    {
+        label:'Margen',
+        value:pct(margen.real),
+        sub:`Desviación ${pp(margen.desvPresupuesto)}`,
+        negative:margen.desvPresupuesto<0
+    },
+
+    {
+        label:'Ventas',
+        value:money(ventas.real),
+        sub:`Presupuesto ${money(ventas.previsto)}`,
+        negative:ventas.real<ventas.previsto
+    }
+
+];
+
+document.getElementById('kpis').innerHTML =
+    kpis.map(k => `
+
+        <div class="card">
+
+            <div class="kpi-label">
+                ${k.label}
+            </div>
+
+            <div class="kpi-value ${k.negative ? 'negative':''}">
+                ${k.value}
+            </div>
+
+            <div class="kpi-sub">
+                ${k.sub}
+            </div>
+
+        </div>
+
+    `).join('');
+
+
+/* =========================
+   DRIVERS
+========================= */
+
+document.getElementById('drivers').innerHTML =
+    report.drivers.map(driver => {
+
+        const investigacion =
+            getInvestigacion(driver.area);
+
+        return `
+
+        <div class="card driver">
+
+            <div class="driver-rank">
+                PRIORIDAD ${driver.prioridad}
+            </div>
+
+            <div class="driver-title">
+                ${driver.area}
+            </div>
+
+            <div class="driver-impact">
+                ${money(driver.impactoEbitda)}
+            </div>
+
+            <div class="driver-text">
+                ${investigacion?.motivo || ''}
+            </div>
+
+            <div class="tags">
+
+                ${
+                    driver.dimensiones
+                    .map(d => `<span class="tag">${d}</span>`)
+                    .join('')
+                }
+
+            </div>
+
+        </div>
+
+        `;
+
+    }).join('');
+
+
+/* =========================
+   COMPENSADORES
+========================= */
+
+document.getElementById('compensadores').innerHTML =
+    report.compensadores.map(c => `
+
+        <div class="compensador">
+
+            <strong>${c.area}</strong>
+            &nbsp;
+            +${money(c.impactoEbitda)}
+
+        </div>
+
+    `).join('');
+
+
+/* =========================
+   ACCIONES
+========================= */
+
+document.getElementById('acciones').innerHTML =
+    report.acciones.map(a => `
+
+        <div class="card">
+
+            <div class="action-number">
+                ${a.orden}
+            </div>
+
+            <div class="action-title">
+                ${a.titulo}
+            </div>
+
+            <div class="action-detail">
+                ${a.detalle}
+            </div>
+
+        </div>
+
+    `).join('');
+
+
+/* =========================
+   GRÁFICO EBITDA SVG
+========================= */
+
+function renderEbitdaChart(){
+
+    const data = report.tendencia6Meses;
+
+    const width = 760;
+    const height = 220;
+
+    const padX = 45;
+    const padY = 25;
+
+    const max =
+        Math.max(
+            ...data.map(x =>
+                Math.max(x.ebitdaReal,x.ebitdaPpto)
+            )
+        );
+
+    const xStep =
+        (width-padX*2)/(data.length-1);
+
+    const y = value =>
+        height-padY-
+        (
+            value/max *
+            (height-padY*2)
+        );
+
+    const pointsReal =
+        data.map(
+            (d,i)=>
+                `${padX+i*xStep},${y(d.ebitdaReal)}`
+        ).join(' ');
+
+    const pointsPpto =
+        data.map(
+            (d,i)=>
+                `${padX+i*xStep},${y(d.ebitdaPpto)}`
+        ).join(' ');
+
+    const labels =
+        data.map(
+            (d,i)=>`
+                <text
+                    x="${padX+i*xStep}"
+                    y="${height-3}"
+                    text-anchor="middle"
+                    font-size="10"
+                    fill="#6b7280">
+                    ${d.periodo.substring(5)}
+                </text>
+            `
+        ).join('');
+
+    document.getElementById('chartEbitda').innerHTML = `
+
+    <svg
+        viewBox="0 0 ${width} ${height}"
+        preserveAspectRatio="none">
+
+        <line
+            x1="${padX}"
+            y1="${height-padY}"
+            x2="${width-padX}"
+            y2="${height-padY}"
+            stroke="#d1d5db"/>
+
+        <polyline
+            points="${pointsPpto}"
+            fill="none"
+            stroke="#9ca3af"
+            stroke-width="2"
+            stroke-dasharray="6 5"/>
+
+        <polyline
+            points="${pointsReal}"
+            fill="none"
+            stroke="#991b1b"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+
+        ${labels}
+
+    </svg>
+
+    `;
+
+}
+
+renderEbitdaChart();
+
+</script>
+
+</body>
+</html>
